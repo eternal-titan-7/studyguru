@@ -13,13 +13,13 @@ function App() {
   const [loading, setLoading] = useState(false);
   const [uid, setUid] = useState("");
   const auth = getAuth();
-  if (window.location.hostname === "localhost") {
-    try {
-      connectAuthEmulator(auth, "http://127.0.0.1:9099", {
-        disableWarnings: true,
-      });
-    } catch (error) {}
-  }
+  // if (window.location.hostname === "localhost") {
+  //   try {
+  //     connectAuthEmulator(auth, "http://127.0.0.1:9099", {
+  //       disableWarnings: true,
+  //     });
+  //   } catch (error) {}
+  // }
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {

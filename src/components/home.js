@@ -272,9 +272,7 @@ function HomePage({ uid }) {
         <div className="app-body">
           <aside className="app-sidebar">
             <div
-              className={
-                "app-sidebar-item " + (view === "home" && "active")
-              }
+              className={"app-sidebar-item " + (view === "home" && "active")}
               onClick={dashView}
             >
               <SVGS svgName="dashboard" Class="sidebar-icon"></SVGS>
@@ -294,7 +292,9 @@ function HomePage({ uid }) {
               <SVGS svgName="courses" Class="sidebar-icon"></SVGS>
               <span className="sidebar-text">My Courses</span>
             </div>
-            {["viewCourse", "assignments", "materials"].includes(content) && (
+            {["viewCourse", "grades", "assignments", "materials"].includes(
+              content
+            ) && (
               <>
                 {userData.role === "Student" && (
                   <div
