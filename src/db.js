@@ -17,13 +17,13 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 
 const db = getFirestore(app);
-// if (window.location.hostname === "localhost") {
-//   connectFirestoreEmulator(db, "localhost", 8080);
-// }
+if (window.location.hostname === "localhost") {
+  connectFirestoreEmulator(db, "localhost", 8080);
+}
 
 const storage = getStorage(app);
-// if (window.location.hostname === "localhost") {
-//   connectStorageEmulator(storage, "localhost", 9199);
-// }
+if (window.location.hostname === "localhost") {
+  connectStorageEmulator(storage, "localhost", 9199);
+}
 
 export default db;
