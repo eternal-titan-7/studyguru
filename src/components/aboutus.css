@@ -1,0 +1,30 @@
+.about-us-card {
+  width: 70%;
+  height: fit-content;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  background: #ffffff50;
+  transition: ease-in-out 0.2s;
+  padding: 10px;
+  border-radius: 10px;
+  margin: 5px;
+  backdrop-filter: blur(7px);
+}
+
+.about-us-title {
+  font-size: 1.2em;
+  font-weight: 500;
+  color: #0c40a0;
+}
+
+.about-us-text {
+  text-align: justify;
+  color: #0c304d;
+}
+
+.about-us-text a {
+  color: #0b5daa;
+}

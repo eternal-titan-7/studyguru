@@ -1,9 +1,7 @@
-// Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
+import { getFirestore, connectFirestoreEmulator } from "firebase/firestore";
+import { connectStorageEmulator, getStorage } from "firebase/storage";
 
-// Your web app's Firebase configuration
 const firebaseConfig = {
   apiKey: "AIzaSyAWkzAhkRe5NtVbXHbaQTO5u1-5zPWKDRo",
   authDomain: "studyguru-7.firebaseapp.com",
@@ -11,7 +9,21 @@ const firebaseConfig = {
   storageBucket: "studyguru-7.appspot.com",
   messagingSenderId: "607540387981",
   appId: "1:607540387981:web:821e5064b39907b03a42c4",
+  host: "localhost",
+  port: 8080,
+  ssl: false,
 };
 
-// Initialize Firebase
 const app = initializeApp(firebaseConfig);
+
+const db = getFirestore(app);
+if (window.location.hostname === "localhost") {
+  connectFirestoreEmulator(db, "localhost", 8080);
+}
+
+const storage = getStorage(app);
+if (window.location.hostname === "localhost") {
+  connectStorageEmulator(storage, "localhost", 9199);
+}
+
+export default db;
