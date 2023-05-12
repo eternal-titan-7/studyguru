@@ -3,8 +3,10 @@ import Loader from "./loader";
 import {
   Timestamp,
   addDoc,
+  arrayRemove,
   arrayUnion,
   collection,
+  deleteDoc,
   doc,
   getDoc,
   updateDoc,
@@ -32,6 +34,7 @@ function Assignment({ role, uid, courseCode }) {
   const [maxGrade, setMaxGrade] = useState(100);
   const [uploading, setUploading] = useState(false);
   const [uploaded, setUploaded] = useState(0);
+  const [startDatetime, setStartDatetime] = useState("");
   const [dueDatetime, setDueDatetime] = useState("");
   const [selectedFile, setSelectedFile] = useState();
   const [selectedFile1, setSelectedFile1] = useState();
@@ -73,76 +76,96 @@ function Assignment({ role, uid, courseCode }) {
             doc(db, "assignments", assignment)
           );
           const assignmentData = assignmentDocSnap.data();
-          var submitted = (
-            <div className="submit-button" onClick={handleAddFile1(assignment)}>
-              <SVGS svgName="add" Class="add-icon1"></SVGS>
-              <span>Submit Assignment</span>
-              <input
-                type="file"
-                onChange={fileChange1}
-                ref={fileInputRef1}
-                style={{ display: "none" }}
-              ></input>
-            </div>
-          );
-          var Status = lateornot(assignmentData.due.toDate(), new Date());
-          var submission = null;
-          for (const sub of assignmentData.submitted) {
-            if (sub.suid === uid) {
-              submitted = <div className="green-button">&#9989; Submitted</div>;
-              Status = lateornot(
-                assignmentData.due.toDate(),
-                sub.time.toDate()
-              );
-              submission = (
-                <div>
-                  <span className="assignment-title">Submitted:</span>
+          if (
+            assignmentData &&
+            (assignmentData.start.toDate() <= new Date() || role === "Teacher")
+          ) {
+            var submitted = (
+              <div
+                className="submit-button"
+                onClick={handleAddFile1(assignment)}
+              >
+                <SVGS svgName="add" Class="add-icon1"></SVGS>
+                <span>Submit Assignment</span>
+                <input
+                  type="file"
+                  onChange={fileChange1}
+                  ref={fileInputRef1}
+                  style={{ display: "none" }}
+                ></input>
+              </div>
+            );
+            var Status = lateornot(assignmentData.due.toDate(), new Date());
+            var submission = null;
+            for (const sub of assignmentData.submitted) {
+              if (sub.suid === uid) {
+                submitted = (
+                  <div className="green-button">&#9989; Submitted</div>
+                );
+                Status = lateornot(
+                  assignmentData.due.toDate(),
+                  sub.time.toDate()
+                );
+                submission = (
+                  <div>
+                    <span className="assignment-title">Submitted:</span>
+                    <div
+                      className="assignment-download"
+                      onClick={downloadFile(sub.file)}
+                    >
+                      <SVGS svgName="download" Class="download-icon" />
+                      <span>{sub.file}</span>
+                    </div>
+                  </div>
+                );
+              }
+            }
+            card.push(
+              <article className="assignment-card" key={assignment}>
+                <div className="assignment-header">
+                  <div className="assignment-title">{assignmentData.title}</div>
+                  {Status}
+                  {role === "Teacher" && (
+                    <button
+                      className="delete-btn"
+                      onClick={deleteAssignment(assignment)}
+                    >
+                      <SVGS svgName="delete" Class="delete-icon"></SVGS>
+                    </button>
+                  )}
+                </div>
+                <div className="assignment-caption">
+                  {assignmentData.caption}
+                </div>
+                {assignmentData.file && (
                   <div
                     className="assignment-download"
-                    onClick={downloadFile(sub.file)}
+                    onClick={downloadFile(assignmentData.file)}
                   >
                     <SVGS svgName="download" Class="download-icon" />
-                    <span>{sub.file}</span>
-                  </div>
-                </div>
-              );
-            }
-          }
-          card.push(
-            <article className="assignment-card" key={assignment}>
-              <div className="assignment-header">
-                <div className="assignment-title">{assignmentData.title}</div>
-                {Status}
-              </div>
-              <div className="assignment-caption">{assignmentData.caption}</div>
-              {assignmentData.file && (
-                <div
-                  className="assignment-download"
-                  onClick={downloadFile(assignmentData.file)}
-                >
-                  <SVGS svgName="download" Class="download-icon" />
-                  <span>{assignmentData.file}</span>
-                </div>
-              )}
-              {role === "Student" && submission}
-              <div className="assignment-footer">
-                <span className="assignment-due">
-                  Due: {assignmentData.due.toDate().toLocaleString("IN")}
-                </span>
-                {role === "Student" ? (
-                  submitted
-                ) : (
-                  <div
-                    className="submissions-button"
-                    onClick={listSubmissions(assignment)}
-                  >
-                    <SVGS svgName="people" Class="people-icon"></SVGS>
-                    <span>Submissions</span>
+                    <span>{assignmentData.file}</span>
                   </div>
                 )}
-              </div>
-            </article>
-          );
+                {role === "Student" && submission}
+                <div className="assignment-footer">
+                  <span className="assignment-due">
+                    Due: {assignmentData.due.toDate().toLocaleString("IN")}
+                  </span>
+                  {role === "Student" ? (
+                    submitted
+                  ) : (
+                    <div
+                      className="submissions-button"
+                      onClick={listSubmissions(assignment)}
+                    >
+                      <SVGS svgName="people" Class="people-icon"></SVGS>
+                      <span>Submissions</span>
+                    </div>
+                  )}
+                </div>
+              </article>
+            );
+          }
         }
         setAssignmentsCard(card);
       }
@@ -222,20 +245,10 @@ function Assignment({ role, uid, courseCode }) {
         }
         setSubmittedCard(card);
       }
+      setLoading(false);
     }
     if (content === "submissions") {
       fetchSubmitted();
-    }
-  });
-
-  useEffect(() => {
-    if (textAreaRef.current) {
-      textAreaRef.current.style.height = "auto";
-      textAreaRef.current.style.height = `${textAreaRef.current.scrollHeight}px`;
-    }
-    if (textAreaRef1.current) {
-      textAreaRef1.current.style.height = "auto";
-      textAreaRef1.current.style.height = `${textAreaRef1.current.scrollHeight}px`;
     }
   });
 
@@ -312,6 +325,7 @@ function Assignment({ role, uid, courseCode }) {
             const assignment = {
               title: title.trim(),
               caption: caption.trim(),
+              start: new Date(startDatetime),
               due: new Date(dueDatetime),
               file: selectedFile.name,
               submitted: [],
@@ -338,6 +352,7 @@ function Assignment({ role, uid, courseCode }) {
         const assignment = {
           title: title.trim(),
           caption: caption.trim(),
+          start: startDatetime ? new Date(startDatetime) : new Date(),
           due: new Date(dueDatetime),
           file: "",
           submitted: [],
@@ -416,8 +431,24 @@ function Assignment({ role, uid, courseCode }) {
     }
   };
 
+  const deleteAssignment = useCallback(
+    (id) => {
+      return async () => {
+        setLoading(true);
+        const assignmentRef = doc(db, "assignments", id);
+        await deleteDoc(assignmentRef);
+        const courseRef = doc(db, "courses", courseCode);
+        await updateDoc(courseRef, {
+          assignments: arrayRemove(id),
+        });
+      };
+    },
+    [courseCode]
+  );
+
   const handleAwardGrades = async (e) => {
     e.preventDefault();
+    setLoading(true);
     const studentRef = doc(db, "users", Suid);
     updateDoc(studentRef, {
       grades: arrayUnion({
@@ -438,10 +469,18 @@ function Assignment({ role, uid, courseCode }) {
 
   const handleCaption = (e) => {
     setCaption(e.target.value);
+    textAreaRef.current.style.height = "auto";
+    textAreaRef.current.style.height = `${textAreaRef.current.scrollHeight}px`;
   };
 
   const handleRemark = (e) => {
     setRemark(e.target.value);
+    textAreaRef1.current.style.height = "auto";
+    textAreaRef1.current.style.height = `${textAreaRef1.current.scrollHeight}px`;
+  };
+
+  const handleStartDatetime = (e) => {
+    setStartDatetime(e.target.value);
   };
 
   const handleDueDatetime = (e) => {
@@ -536,6 +575,15 @@ function Assignment({ role, uid, courseCode }) {
                 onChange={handleCaption}
                 ref={textAreaRef}
               />
+              <label className="row">
+                Start:
+                <input
+                  className="field3"
+                  type="datetime-local"
+                  value={startDatetime}
+                  onChange={handleStartDatetime}
+                ></input>
+              </label>
               <label className="row">
                 Due:
                 <input

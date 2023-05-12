@@ -393,7 +393,7 @@
   background-color: #2586c5;
 }
 
-.course-delete-btn {
+.delete-btn {
   top: 5%;
   right: 5%;
   color: white;
@@ -412,12 +412,12 @@
   box-shadow: #e94040 0 0 7px 1px;
 }
 
-.course-delete-btn:hover {
+.delete-btn:hover {
   background: linear-gradient(145deg, #93291e, #ed213a);
   transform: scale(0.8);
 }
 
-.course-delete-btn:active {
+.delete-btn:active {
   transform: scale(1.15);
 }
 

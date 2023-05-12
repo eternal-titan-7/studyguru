@@ -140,20 +140,23 @@ function Chats({ uid }) {
   };
 
   async function createNewChat() {
-    setLoading(true);
     if (chatUri.trim() !== "") {
+      setLoading(true);
       const chatRef = collection(db, "users");
       const q = query(chatRef, where("email", "==", chatUri));
       const querySnapshot = await getDocs(q);
       if (querySnapshot.empty) {
         alert("User not found");
+        setLoading(false);
       } else {
         if (uid !== querySnapshot.docs[0].id) {
+          setLoading(true);
           if (
             (await checkIfDocExists("chats", uid + querySnapshot.docs[0].id)) ||
             (await checkIfDocExists("chats", querySnapshot.docs[0].id + uid))
           ) {
             alert("Chat already exists");
+            setLoading(false);
           } else {
             const docRef = doc(db, "chats", uid + querySnapshot.docs[0].id);
             await setDoc(docRef, {

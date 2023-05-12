@@ -1,10 +1,17 @@
 import React, { useEffect, useRef, useState } from "react";
 import "./material.css";
-import { arrayUnion, doc, onSnapshot, updateDoc } from "firebase/firestore";
+import {
+  arrayRemove,
+  arrayUnion,
+  doc,
+  onSnapshot,
+  updateDoc,
+} from "firebase/firestore";
 import db from "../db";
 import SVGS from "./svgs";
 import Loader from "./loader";
 import {
+  deleteObject,
   getDownloadURL,
   getMetadata,
   getStorage,
@@ -40,6 +47,26 @@ function Material({ role, courseCode }) {
     [courseCode, storage]
   );
 
+  const deleteFile = useCallback(
+    (obj) => {
+      return async () => {
+        setLoading(true);
+        const storageRef = ref(storage, `materials/${courseCode}/${obj.name}`);
+        deleteObject(storageRef)
+          .then(() => {
+            const docRef = doc(db, "courses", courseCode);
+            updateDoc(docRef, {
+              materials: arrayRemove(obj),
+            });
+          })
+          .catch((error) => {
+            alert(error);
+          });
+      };
+    },
+    [courseCode, storage]
+  );
+
   useEffect(() => {
     async function fetchData(courseCode) {
       const docRef = doc(db, "courses", courseCode);
@@ -54,19 +81,26 @@ function Material({ role, courseCode }) {
               <span className="file-time">
                 {file.time.toDate().toLocaleString("IN")}
               </span>
-              <button
-                className="file-download"
-                onClick={downloadFile(file.name)}
-              >
-                <SVGS svgName="download" Class="download-icon"></SVGS>
-              </button>
+              <div className="row">
+                {role === "Teacher" && (
+                  <button
+                    className="delete-btn"
+                    onClick={deleteFile(file)}
+                  >
+                    <SVGS svgName="delete" Class="delete-icon"></SVGS>
+                  </button>
+                )}
+                <button
+                  className="file-download"
+                  onClick={downloadFile(file.name)}
+                >
+                  <SVGS svgName="download" Class="download-icon"></SVGS>
+                </button>
+              </div>
             </div>
-            <textarea
-              disabled
-              className="field3"
-              value={file.caption}
-              ref={textAreaRef}
-            />
+            <p className="assignment-caption" style={{ height: "fit-content" }}>
+              {file.caption}
+            </p>
           </article>
         ));
         setFileCard(fileCard);
@@ -74,7 +108,7 @@ function Material({ role, courseCode }) {
       });
     }
     fetchData(courseCode);
-  }, [role, courseCode, downloadFile]);
+  }, [role, courseCode, deleteFile, downloadFile]);
 
   const decorateFileSize = (fileSize) => {
     if (fileSize < 1024) {
@@ -88,19 +122,14 @@ function Material({ role, courseCode }) {
     }
   };
 
-  useEffect(() => {
-    if (textAreaRef.current) {
-      textAreaRef.current.style.height = "auto";
-      textAreaRef.current.style.height = `${textAreaRef.current.scrollHeight}px`;
-    }
-  });
-
   const handleUploadClick = () => {
     fileInputRef.current.click();
   };
 
   const handleCaption = (e) => {
     setCaption(e.target.value);
+    textAreaRef.current.style.height = "auto";
+    textAreaRef.current.style.height = `${textAreaRef.current.scrollHeight}px`;
   };
 
   const handleUploadFile = async (e) => {
@@ -114,15 +143,13 @@ function Material({ role, courseCode }) {
           `materials/${courseCode}/${currentFile.name}`
         );
         try {
-          await (async () => {
-            try {
-              await getMetadata(storageRef);
-              alert("A file with the same name already exists.");
-              setUploading(false);
-              setContent("materials");
-              return;
-            } catch (error) {}
-          })();
+          try {
+            await getMetadata(storageRef);
+            alert("A file with the same name already exists.");
+            setUploading(false);
+            setContent("materials");
+            return;
+          } catch (error) {}
         } catch (error) {}
 
         const uploadTask = uploadBytesResumable(storageRef, currentFile);

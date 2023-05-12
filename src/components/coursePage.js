@@ -59,7 +59,7 @@ function CoursePage({ role, courseCode, backFunc }) {
         </div>
       ));
       setPostCard(postCard);
-      if (content === "Students") {
+      if (content === "Students" && courseData.students) {
         const studentData = [];
         for (const suid of courseData.students) {
           const docSnap = await getDoc(doc(db, "users", suid));

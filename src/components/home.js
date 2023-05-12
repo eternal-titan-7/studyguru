@@ -194,7 +194,7 @@ function HomePage({ uid }) {
         </button>
       </div>
     );
-    if (!userData.courses && content !== "courses") {
+    if (!userData.courses || content !== "courses") {
       setLoading(false);
       return;
     }
@@ -223,7 +223,7 @@ function HomePage({ uid }) {
             <div className="course-btns">
               {userData.role === "Teacher" && (
                 <button
-                  className="course-delete-btn"
+                  className="delete-btn"
                   onClick={deleteCourse(userData.courses[i])}
                 >
                   <SVGS svgName="delete" Class="delete-icon"></SVGS>
