@@ -105,9 +105,7 @@
   justify-content: center;
   align-items: center;
   cursor: pointer;
-  background: linear-gradient(270deg, #36D1DC, #5B86E5);
-  margin-bottom: 25px;
-  
+  background: linear-gradient(270deg, #36d1dc, #5b86e5);
 }
 
 .img-wrap {
@@ -317,4 +315,20 @@
   cursor: pointer;
   gap: 1em;
   color: #394a56;
+}
+
+@media (max-width: 767px) {
+  h1 {
+    font-size: 1.5em;
+  }
+
+  .custom-file-upload {
+    width: 66px;
+    height: 66px;
+  }
+
+  .img-wrap {
+    width: 60px;
+    height: 60px;
+  }
 }

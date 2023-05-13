@@ -15,14 +15,13 @@
   flex-flow: wrap row;
   justify-content: space-between;
   align-items: center;
-  width: 100;
-  padding: 16px 24px;
+  padding: 5px;
   position: relative;
   border-bottom-right-radius: 10px;
   background: #e6f1ff;
 }
 
-.app-header-left {
+.app-header-logo {
   display: flex;
   flex-flow: wrap row;
   align-items: center;
@@ -37,7 +36,7 @@
 .app-name {
   font-size: 1.5rem;
   font-weight: bold;
-  margin: 0 32px;
+  margin: 0 5px;
   padding: 0;
   color: #4d4d4d;
   background: linear-gradient(
@@ -84,12 +83,11 @@
 
 .app-sidebar {
   flex-wrap: wrap;
-  display: flex;
+  display: table;
   flex-direction: column;
   position: relative;
   width: fit-content;
   padding: 10px;
-  height: 100;
   background: #e6f1ff;
   border-top-right-radius: 10px;
   border-bottom-right-radius: 10px;
@@ -100,8 +98,8 @@
 .app-sidebar-item {
   height: fit-content;
   display: flex;
-  align-items: center;
-  margin: 10px 10px;
+  place-items: center;
+  margin: 10px;
   padding: 10px;
   cursor: pointer;
   transition: ease-in-out 0.2s;
@@ -125,13 +123,13 @@
 }
 
 .app-profile {
-  position: absolute;
+  position: relative;
   right: 0;
   height: fit-content;
   display: flex;
   flex-flow: wrap row;
   align-items: center;
-  margin: 20px;
+  margin: 5px;
   margin-left: 2px;
   border-radius: 10px;
   cursor: pointer;
@@ -206,13 +204,40 @@
   padding: 10px;
 }
 
+.menu-icon {
+  width: 24px;
+  height: 24px;
+  fill: none;
+}
+
+.app-menu {
+  display: none;
+  border: none;
+  outline: none;
+  background: transparent;
+  place-items: center;
+  place-content: center;
+  margin: 5px;
+  padding: 5px;
+  cursor: pointer;
+  transition: ease-in-out 0.2s;
+  border-radius: 10px;
+  background: linear-gradient(145deg, #f6ffff, #cfd9e6);
+  box-shadow: 5px 5px 4px #d1dbe8, -5px -5px 4px #fbffff;
+}
+
+.app-menu:active {
+  background: linear-gradient(145deg, #cfd9e6, #f6ffff);
+  box-shadow: 5px 5px 4px #d1dbe8, -5px -5px 4px #fbffff;
+}
+
 .glass-card {
   width: fit-content;
   height: fit-content;
   display: flex;
   flex-flow: wrap row;
-  justify-content: center;
-  align-items: center;
+  place-items: center;
+  place-content: center;
   position: relative;
   background: #ffffff50;
   transition: ease-in-out 0.2s;
@@ -227,13 +252,13 @@
   width: 200px;
   height: 200px;
   border-radius: 10%;
-  margin-right: 20px;
 }
 
 .welcome-text {
   font-size: 1.5rem;
   margin: 10px;
   padding: 0;
+  text-align: center;
   word-wrap: break-word;
   white-space: wrap;
 }
@@ -615,4 +640,66 @@
   flex-flow: row wrap;
   align-items: center;
   transition: ease-in-out 0.2s;
+}
+
+@media (max-width: 767px) {
+  .app-header {
+    border-bottom-left-radius: 10px;
+  }
+
+  .app-icon {
+    width: 24px;
+    height: 24px;
+    margin: 0 10px;
+  }
+
+  .app-name {
+    font-size: 1em;
+    margin: 0 10px;
+  }
+
+  .app-sidebar {
+    position: absolute;
+    z-index: 5;
+  }
+
+  .app-menu {
+    display: flex;
+  }
+
+  .app-profile {
+    margin: 5px;
+  }
+
+  .profile-icon {
+    width: 24px;
+    height: 24px;
+  }
+
+  .profile-name {
+    font-size: 0.8em;
+  }
+
+  .profile-email {
+    font-size: 0.6em;
+  }
+
+  .signout {
+    margin: 5px;
+    margin-left: 10px;
+  }
+
+  .signout-icon {
+    width: 16px;
+    height: 16px;
+  }
+
+  .welcome-image {
+    width: 100px;
+    height: 100px;
+  }
+
+  .welcome-text {
+    font-size: 16px;
+  }
 }

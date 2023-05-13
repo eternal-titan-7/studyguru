@@ -1,5 +1,5 @@
 .about-us-card {
-  width: 70%;
+  width: fit-content;
   height: fit-content;
   display: flex;
   flex-direction: column;
@@ -23,6 +23,8 @@
 .about-us-text {
   text-align: justify;
   color: #0c304d;
+  word-wrap: break-word;
+  white-space: pre-wrap;
 }
 
 .about-us-text a {

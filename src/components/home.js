@@ -44,6 +44,16 @@ function HomePage({ uid }) {
   const [course, setCourse] = useState("");
   const [charCount, setCharCount] = useState("");
   const textAreaRef = useRef(null);
+  const sidebarRef = useRef(null);
+
+  function openSidebar() {
+    const sidebar = sidebarRef.current;
+    if (sidebar.style.display === "none") {
+      sidebar.style.display = "flex";
+    } else {
+      sidebar.style.display = "none";
+    }
+  }
 
   function dashView() {
     setView("home");
@@ -173,7 +183,7 @@ function HomePage({ uid }) {
 
   const signout = useCallback(async () => {
     signOut(auth)
-      .then(() => {})
+      .then(() => { })
       .catch((error) => {
         alert(error);
       });
@@ -263,14 +273,17 @@ function HomePage({ uid }) {
     <>
       <div className="app-container">
         <div className="app-header">
-          <div className="app-header-left">
+          <div className="app-header-logo">
             <SVGS svgName="logo" Class="app-icon"></SVGS>
             <p className="app-name">StudyGuru</p>
           </div>
-          {profile}
+          <button className="app-menu" onClick={openSidebar}>
+            <SVGS svgName="menu" Class="menu-icon"></SVGS>
+          </button>
+          {window.innerWidth >= 768 && profile}
         </div>
         <div className="app-body">
-          <aside className="app-sidebar">
+          <aside className="app-sidebar" style={{ display: window.innerWidth < 768 ? "none" : "flex" }} ref={sidebarRef}>
             <div
               className={"app-sidebar-item " + (view === "home" && "active")}
               onClick={dashView}
@@ -295,38 +308,39 @@ function HomePage({ uid }) {
             {["viewCourse", "grades", "assignments", "materials"].includes(
               content
             ) && (
-              <>
-                {userData.role === "Student" && (
+                <>
+                  {userData.role === "Student" && (
+                    <div
+                      className={
+                        "app-sidebar-item " + (view === "grades" && "active")
+                      }
+                      onClick={gradeView}
+                    >
+                      <SVGS svgName="grades" Class="sidebar-icon"></SVGS>
+                      <span className="sidebar-text">My Grades</span>
+                    </div>
+                  )}
                   <div
                     className={
-                      "app-sidebar-item " + (view === "grades" && "active")
+                      "app-sidebar-item " + (view === "assignments" && "active")
                     }
-                    onClick={gradeView}
+                    onClick={assignView}
                   >
-                    <SVGS svgName="grades" Class="sidebar-icon"></SVGS>
-                    <span className="sidebar-text">My Grades</span>
+                    <SVGS svgName="homework" Class="sidebar-icon"></SVGS>
+                    <span className="sidebar-text">Assignments/Tests</span>
                   </div>
-                )}
-                <div
-                  className={
-                    "app-sidebar-item " + (view === "assignments" && "active")
-                  }
-                  onClick={assignView}
-                >
-                  <SVGS svgName="homework" Class="sidebar-icon"></SVGS>
-                  <span className="sidebar-text">Assignments/Tests</span>
-                </div>
-                <div
-                  className={
-                    "app-sidebar-item " + (view === "materials" && "active")
-                  }
-                  onClick={resView}
-                >
-                  <SVGS svgName="materials" Class="sidebar-icon"></SVGS>
-                  <span className="sidebar-text">Study Materials</span>
-                </div>
-              </>
-            )}
+                  <div
+                    className={
+                      "app-sidebar-item " + (view === "materials" && "active")
+                    }
+                    onClick={resView}
+                  >
+                    <SVGS svgName="materials" Class="sidebar-icon"></SVGS>
+                    <span className="sidebar-text">Study Materials</span>
+                  </div>
+                </>
+              )}
+            {window.innerWidth < 768 && profile}
           </aside>
           <div className="app-content">
             {content === "home" && (

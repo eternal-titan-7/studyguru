@@ -22,6 +22,7 @@ import {
   uploadBytesResumable,
 } from "firebase/storage";
 import { getApp } from "firebase/app";
+import Progress from "./progress";
 
 function Assignment({ role, uid, courseCode }) {
   const [loading, setLoading] = useState(true);
@@ -33,7 +34,7 @@ function Assignment({ role, uid, courseCode }) {
   const [grade, setGrade] = useState(0);
   const [maxGrade, setMaxGrade] = useState(100);
   const [uploading, setUploading] = useState(false);
-  const [uploaded, setUploaded] = useState(0);
+  const [progressStatus, setProgressStatus] = useState([]);
   const [startDatetime, setStartDatetime] = useState("");
   const [dueDatetime, setDueDatetime] = useState("");
   const [selectedFile, setSelectedFile] = useState();
@@ -252,18 +253,6 @@ function Assignment({ role, uid, courseCode }) {
     }
   });
 
-  const decorateFileSize = (fileSize) => {
-    if (fileSize < 1024) {
-      return `${fileSize} B`;
-    } else if (fileSize < 1024 * 1024) {
-      return `${(fileSize / 1024).toFixed(2)} KB`;
-    } else if (fileSize < 1024 * 1024 * 1024) {
-      return `${(fileSize / (1024 * 1024)).toFixed(2)} MB`;
-    } else {
-      return `${(fileSize / (1024 * 1024 * 1024)).toFixed(2)} GB`;
-    }
-  };
-
   const lateornot = (due, time) => {
     if (due <= time) {
       return <span className="redLabel">Late</span>;
@@ -283,7 +272,7 @@ function Assignment({ role, uid, courseCode }) {
     } else if (
       !dueDatetime ||
       Timestamp.fromDate(new Date(dueDatetime)) <=
-        Timestamp.fromDate(new Date())
+      Timestamp.fromDate(new Date())
     ) {
       alert("Invalid Due date and time!");
     } else {
@@ -297,26 +286,18 @@ function Assignment({ role, uid, courseCode }) {
           await getMetadata(storageRef);
           setContent("assignments");
           setUploading(false);
-          setUploaded(0);
+          setProgressStatus([]);
           setSelectedFile(null);
           setTitle("");
           setCaption("");
           setDueDatetime("");
           return;
-        } catch (e) {}
+        } catch (e) { }
         const uploadTask = uploadBytesResumable(storageRef, selectedFile);
         uploadTask.on(
           "state_changed",
           (snapshot) => {
-            const progress =
-              (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-            setUploaded(
-              decorateFileSize(snapshot.bytesTransferred) +
-                " / " +
-                decorateFileSize(snapshot.totalBytes) +
-                " => " +
-                progress.toFixed(2)
-            );
+            setProgressStatus([snapshot.bytesTransferred, snapshot.totalBytes]);
           },
           (error) => {
             console.log(error);
@@ -337,7 +318,7 @@ function Assignment({ role, uid, courseCode }) {
                 });
                 setContent("assignments");
                 setUploading(false);
-                setUploaded(0);
+                setProgressStatus([]);
                 setSelectedFile(null);
                 setTitle("");
                 setCaption("");
@@ -364,7 +345,7 @@ function Assignment({ role, uid, courseCode }) {
             });
             setContent("assignments");
             setUploading(false);
-            setUploaded(0);
+            setProgressStatus([]);
             setSelectedFile(null);
             setTitle("");
             setCaption("");
@@ -390,24 +371,16 @@ function Assignment({ role, uid, courseCode }) {
         alert("File already exists!");
         setContent("assignments");
         setUploading(false);
-        setUploaded(0);
+        setProgressStatus([]);
         setSelectedFile1(null);
         setAssignment("");
         return;
-      } catch (e) {}
+      } catch (e) { }
       const uploadTask = uploadBytesResumable(storageRef, selectedFile1);
       uploadTask.on(
         "state_changed",
         (snapshot) => {
-          const progress =
-            (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-          setUploaded(
-            decorateFileSize(snapshot.bytesTransferred) +
-              " / " +
-              decorateFileSize(snapshot.totalBytes) +
-              " => " +
-              progress.toFixed(2)
-          );
+          setProgressStatus([snapshot.bytesTransferred, snapshot.totalBytes]);
         },
         (error) => {
           console.log(error);
@@ -423,8 +396,7 @@ function Assignment({ role, uid, courseCode }) {
           });
           setContent("assignments");
           setUploading(false);
-          setUploaded(0);
-          setSelectedFile1(null);
+          setProgressStatus([]); setSelectedFile1(null);
           setAssignment("");
         }
       );
@@ -593,7 +565,7 @@ function Assignment({ role, uid, courseCode }) {
                   onChange={handleDueDatetime}
                 ></input>
               </label>
-              {uploading && <p>Upload Progress: {uploaded}%</p>}
+              {uploading && <Progress args={progressStatus}></Progress>}
               <button className="button" type="submit">
                 post
               </button>
@@ -605,7 +577,7 @@ function Assignment({ role, uid, courseCode }) {
             <label className="fileName field3">
               {selectedFile1 ? selectedFile1.name : "No file selected"}
             </label>
-            {uploading && <p>Upload Progress: {uploaded}%</p>}
+            {uploading && <Progress args={progressStatus}></Progress>}
             <button className="button" type="submit">
               Submit Assignment
             </button>

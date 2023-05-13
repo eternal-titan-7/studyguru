@@ -20,6 +20,8 @@ import {
 } from "firebase/storage";
 import { getApp } from "firebase/app";
 import { useCallback } from "react";
+import Progress from "./progress";
+import { decorateFileSize } from "./progressUtils";
 
 function Material({ role, courseCode }) {
   const [loading, setLoading] = useState(true);
@@ -28,7 +30,7 @@ function Material({ role, courseCode }) {
   const [currentFile, setCurrentFile] = useState("");
   const [caption, setCaption] = useState("");
   const [uploading, setUploading] = useState(false);
-  const [uploaded, setUploaded] = useState(0);
+  const [progressStatus, setProgressStatus] = useState([]);
   const [fileCard, setFileCard] = useState("");
   const fileInputRef = useRef(null);
   const textAreaRef = useRef(null);
@@ -110,18 +112,6 @@ function Material({ role, courseCode }) {
     fetchData(courseCode);
   }, [role, courseCode, deleteFile, downloadFile]);
 
-  const decorateFileSize = (fileSize) => {
-    if (fileSize < 1024) {
-      return `${fileSize} B`;
-    } else if (fileSize < 1024 * 1024) {
-      return `${(fileSize / 1024).toFixed(2)} KB`;
-    } else if (fileSize < 1024 * 1024 * 1024) {
-      return `${(fileSize / (1024 * 1024)).toFixed(2)} MB`;
-    } else {
-      return `${(fileSize / (1024 * 1024 * 1024)).toFixed(2)} GB`;
-    }
-  };
-
   const handleUploadClick = () => {
     fileInputRef.current.click();
   };
@@ -137,7 +127,7 @@ function Material({ role, courseCode }) {
     if (currentFile) {
       if (currentFile.size <= 100 * 1024 * 1024) {
         setUploading(true);
-        setUploaded(0);
+        setProgressStatus([]);
         const storageRef = ref(
           storage,
           `materials/${courseCode}/${currentFile.name}`
@@ -149,22 +139,14 @@ function Material({ role, courseCode }) {
             setUploading(false);
             setContent("materials");
             return;
-          } catch (error) {}
-        } catch (error) {}
+          } catch (error) { }
+        } catch (error) { }
 
         const uploadTask = uploadBytesResumable(storageRef, currentFile);
         uploadTask.on(
           "state_changed",
           (snapshot) => {
-            const progress =
-              (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-            setUploaded(
-              decorateFileSize(snapshot.bytesTransferred) +
-                " / " +
-                decorateFileSize(snapshot.totalBytes) +
-                " => " +
-                progress.toFixed(2)
-            );
+            setProgressStatus([snapshot.bytesTransferred, snapshot.totalBytes]);
           },
           (error) => {
             alert(error);
@@ -231,7 +213,8 @@ function Material({ role, courseCode }) {
                   onChange={handleCaption}
                   ref={textAreaRef}
                 />
-                {uploading && <p>Upload Progress: {uploaded}%</p>}
+
+                {uploading && <Progress args={progressStatus}></Progress>}
                 <button className="button" type="submit">
                   Upload File
                 </button>
