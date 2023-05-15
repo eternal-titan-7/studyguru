@@ -1,6 +1,12 @@
 import { initializeApp } from "firebase/app";
-import { getFirestore, connectFirestoreEmulator } from "firebase/firestore";
-import { connectStorageEmulator, getStorage } from "firebase/storage";
+import {
+  getFirestore,
+  // connectFirestoreEmulator
+} from "firebase/firestore";
+import {
+  // connectStorageEmulator,
+  getStorage
+} from "firebase/storage";
 
 const firebaseConfig = {
   apiKey: "AIzaSyAWkzAhkRe5NtVbXHbaQTO5u1-5zPWKDRo",
@@ -21,6 +27,7 @@ const db = getFirestore(app);
 //   connectFirestoreEmulator(db, "localhost", 8080);
 // }
 
+// eslint-disable-next-line no-unused-vars
 const storage = getStorage(app);
 // if (window.location.hostname === "localhost") {
 //   connectStorageEmulator(storage, "localhost", 9199);

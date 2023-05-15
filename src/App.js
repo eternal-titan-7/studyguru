@@ -2,15 +2,15 @@ import { useEffect, useState } from "react";
 import LoginPage from "./components/auth";
 import {
   getAuth,
-  connectAuthEmulator,
+  // connectAuthEmulator,
   onAuthStateChanged,
 } from "firebase/auth";
 import Loader from "./components/loader";
 import HomePage from "./components/home";
 function App() {
-  const [loggedIn, setLoggedIn] = useState(false);
+  const [page, setPage] = useState("home");
   const [loading, setLoading] = useState(false);
-  const [uid, setUid] = useState("");
+  const [uid, setUid] = useState(null);
   const auth = getAuth();
   // if (window.location.hostname === "localhost") {
   //   try {
@@ -23,10 +23,11 @@ function App() {
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
-        setLoggedIn(true);
+        setPage("home");
         setUid(user.uid);
       } else {
-        setLoggedIn(false);
+        // setPage("auth");
+        setUid(null);
       }
     });
     return () => unsubscribe();
@@ -34,7 +35,8 @@ function App() {
 
   return (
     <>
-      {loggedIn ? <HomePage uid={uid} /> : <LoginPage loader={setLoading} />}
+      {page === "home" && <HomePage uid={uid} setPage={setPage} />}
+      {page === "auth" && <LoginPage loader={setLoading} setPage={setPage} />}
       {loading && <Loader />}
     </>
   );

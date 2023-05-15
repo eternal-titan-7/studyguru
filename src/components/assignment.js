@@ -219,7 +219,7 @@ function Assignment({ role, uid, courseCode }) {
                   />
                   <div className="profile-detail">
                     <span className="profile-name">
-                      {studentData.fname} {studentData.lname}
+                      {studentData.name}
                     </span>
                     <span className="profile-email">{studentData.email}</span>
                   </div>

@@ -22,19 +22,18 @@ import Assign from "./assignment";
 import Grades from "./Grades";
 import AboutUs from "./AboutUs";
 
-function HomePage({ uid }) {
+function HomePage({ uid, setPage }) {
   const [loading, setLoading] = useState(true);
   const auth = getAuth();
   const [userData, setUserData] = useState({
     courses: [],
     dp: "",
     email: "",
-    fname: "",
-    lname: "",
+    name: "",
     role: "",
   });
   const [grades, setGrades] = useState();
-  const [profile, setProfile] = useState("");
+  const [profile, setProfile] = useState(null);
   const [view, setView] = useState("home");
   const [content, setContent] = useState("home");
   const [courseName, setCourseName] = useState("");
@@ -55,12 +54,16 @@ function HomePage({ uid }) {
     }
   }
 
-  function dashView() {
+  function homeView() {
     setView("home");
     setContent("home");
   }
 
   async function courseView() {
+    if (!uid) {
+      alert("You are not Signed In!");
+      return;
+    }
     setView("courses");
     setContent("courses");
     if (course.length > 0) {
@@ -76,6 +79,10 @@ function HomePage({ uid }) {
   }
 
   function chatView() {
+    if (!uid) {
+      alert("You are not Signed In!");
+      return;
+    }
     setView("chats");
     setContent("chats");
   }
@@ -183,7 +190,9 @@ function HomePage({ uid }) {
 
   const signout = useCallback(async () => {
     signOut(auth)
-      .then(() => { })
+      .then(() => {
+        homeView();
+      })
       .catch((error) => {
         alert(error);
       });
@@ -195,7 +204,7 @@ function HomePage({ uid }) {
         <img className="profile-icon" src={userData.dp} alt="Profile pic" />
         <div className="profile-detail">
           <span className="profile-name">
-            {userData.fname} {userData.lname}
+            {userData.name}
           </span>
           <span className="profile-email">{userData.email}</span>
         </div>
@@ -223,7 +232,7 @@ function HomePage({ uid }) {
             <h2 className="course-name">{data.name}</h2>
             <p className="course-code">Course Code: {userData.courses[i]}</p>
             <p className="course-teacher">
-              By {data1.fname} {data1.lname}
+              By {data1.name}
             </p>
             <textarea
               disabled
@@ -259,15 +268,24 @@ function HomePage({ uid }) {
     setLoading(false);
   }, [userData, uid, deleteCourse, signout, content]);
 
+  const authPage = useCallback(() => {
+    setPage("auth");
+  }, [setPage]);
+
   useEffect(() => {
-    const docRef = doc(db, "users", uid);
-    const unsubscribe = onSnapshot(docRef, (doc) => {
-      setUserData(doc.data());
-      setGrades(doc.data().grades);
-      getData();
-    });
-    return () => unsubscribe();
-  }, [uid, getData, userData]);
+    if (uid) {
+      const docRef = doc(db, "users", uid);
+      const unsubscribe = onSnapshot(docRef, (doc) => {
+        setUserData(doc.data());
+        setGrades(doc.data().grades);
+        getData();
+      });
+      return () => unsubscribe();
+    } else {
+      setLoading(false);
+      setProfile(<button className="button" onClick={authPage}>LOGIN</button>);
+    }
+  }, [uid, getData, userData, authPage]);
 
   return (
     <>
@@ -286,7 +304,7 @@ function HomePage({ uid }) {
           <aside className="app-sidebar" style={{ display: window.innerWidth < 768 ? "none" : "flex" }} ref={sidebarRef}>
             <div
               className={"app-sidebar-item " + (view === "home" && "active")}
-              onClick={dashView}
+              onClick={homeView}
             >
               <SVGS svgName="dashboard" Class="sidebar-icon"></SVGS>
               <span className="sidebar-text">Home</span>
@@ -348,7 +366,7 @@ function HomePage({ uid }) {
                 <div className="glass-card" style={{ alignSelf: "center" }}>
                   <img src={welcome} alt="welcome" className="welcome-image" />
                   <span className="welcome-text">
-                    Welcome! {userData.fname} {userData.lname} :)
+                    Welcome! {uid ? userData.name : "Dear Unknown User"} :)
                   </span>
                 </div>
                 <AboutUs></AboutUs>

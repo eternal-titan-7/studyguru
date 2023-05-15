@@ -63,7 +63,7 @@ function Chats({ uid }) {
               />
               <div className="chat-card-details">
                 <span className="chat-card-name">
-                  {data1.fname} {data1.lname}
+                  {data1.name}
                 </span>
                 <span className="chat-card-email">{data1.email}</span>
               </div>
@@ -99,7 +99,7 @@ function Chats({ uid }) {
             <img className="profile-icon" src={data1.dp} alt="Profile pic" />
             <div className="profile-detail">
               <span className="profile-name">
-                {data1.fname} {data1.lname}
+                {data1.name}
               </span>
               <span className="profile-email">{data1.email}</span>
             </div>

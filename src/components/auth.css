@@ -257,6 +257,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  position: relative;
   gap: 1.5em;
   padding: 0.6em;
   margin: 0.5em;
@@ -272,9 +273,7 @@
 
 .radio-state {
   position: absolute;
-  top: 0;
-  right: 0;
-  opacity: 1e-5;
+  opacity: 0;
   pointer-events: none;
 }
 

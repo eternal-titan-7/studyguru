@@ -36,7 +36,7 @@ function CoursePage({ role, courseCode, backFunc }) {
           />
           <div className="profile-detail">
             <span className="profile-name">
-              {teacherData.fname} {teacherData.lname}
+              {teacherData.name}
             </span>
             <span className="profile-email">{teacherData.email}</span>
           </div>
@@ -67,7 +67,7 @@ function CoursePage({ role, courseCode, backFunc }) {
           studentData.push({
             uid: suid,
             dp: data.dp,
-            name: data.fname + " " + data.lname,
+            name: data.name,
             email: data.email,
           });
         }

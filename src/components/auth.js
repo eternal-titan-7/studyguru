@@ -11,11 +11,10 @@ import {
 } from "firebase/auth";
 import SVGS from "./svgs";
 
-function LoginPage({ loader }) {
+function LoginPage({ loader, setPage }) {
   const auth = getAuth();
   const [authMode, setAuthMode] = useState("Login");
-  const [fname, setFname] = useState("");
-  const [lname, setLname] = useState("");
+  const [name, setName] = useState("");
   const [role, setRole] = useState("");
   const [email, setEmail] = useState("");
   const [pass, setPass] = useState("");
@@ -95,14 +94,13 @@ function LoginPage({ loader }) {
           alert(errorMessage);
         });
     } else if (authMode === "Sign Up") {
-      if ((fname.length > 0) & (lname.length > 0) & (role.length > 0)) {
+      if ((name.length > 0) & (role.length > 0)) {
         signUp(auth, email, pass)
           .then(async (userCredential) => {
             // const user = userCredential.user;
             await setDoc(doc(db, "users", userCredential.user.uid), {
               dp: pic,
-              fname: fname,
-              lname: lname,
+              name: name,
               role: role,
               email: email,
             });
@@ -118,17 +116,13 @@ function LoginPage({ loader }) {
           });
       } else {
         loader(false);
-        alert("Please fill all the fields");
+        alert("Please fill necessary fields");
       }
     }
   }
 
-  function handleFname(e) {
-    setFname(e.target.value);
-  }
-
-  function handleLname(e) {
-    setLname(e.target.value);
+  function handleName(e) {
+    setName(e.target.value);
   }
 
   function handleRole(e) {
@@ -175,24 +169,13 @@ function LoginPage({ loader }) {
                 <SVGS svgName="name" Class="name-icon"></SVGS>
                 <input
                   autoComplete="off"
-                  placeholder="First Name"
+                  placeholder="Full Name"
                   className="input-field"
                   type="text"
-                  value={fname}
-                  onChange={handleFname}
+                  value={name}
+                  onChange={handleName}
                   maxLength={50}
-                />
-              </div>
-              <div className="field">
-                <SVGS svgName="name" Class="name-icon"></SVGS>
-                <input
-                  autoComplete="off"
-                  placeholder="Last Name"
-                  className="input-field"
-                  type="text"
-                  value={lname}
-                  onChange={handleLname}
-                  maxLength={50}
+                  required
                 />
               </div>
               <div className="radio-field">
@@ -218,6 +201,7 @@ function LoginPage({ loader }) {
                     name="role"
                     value="Teacher"
                     onChange={handleRole}
+                    required
                   ></input>
                   <label className="radio-label" htmlFor="teacher">
                     <div className="indicator" id="checked"></div>
@@ -249,6 +233,7 @@ function LoginPage({ loader }) {
               value={email}
               onChange={handleEmail}
               maxLength={70}
+              required
             />
           </div>
           <div className="field">
@@ -271,6 +256,7 @@ function LoginPage({ loader }) {
               type="password"
               value={pass}
               onChange={handlePass}
+              required
             />
           </div>
           <div className="btn">
