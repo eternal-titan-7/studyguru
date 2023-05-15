@@ -509,7 +509,7 @@ function Assignment({ role, uid, courseCode }) {
         {role === "Teacher" && (
           <button className="newAssignment" onClick={newAssignment}>
             <SVGS svgName="newWork" Class="newWork-icon"></SVGS>
-            <span>New Assignment</span>
+            <span>New Assignment/Test</span>
           </button>
         )}
       </div>

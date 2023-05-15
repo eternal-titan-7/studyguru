@@ -23,6 +23,7 @@ function App() {
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
+        setLoading(true);
         setPage("home");
         setUid(user.uid);
       } else {
@@ -35,7 +36,7 @@ function App() {
 
   return (
     <>
-      {page === "home" && <HomePage uid={uid} setPage={setPage} />}
+      {page === "home" && <HomePage uid={uid} setPage={setPage} setLoading={setLoading} />}
       {page === "auth" && <LoginPage loader={setLoading} setPage={setPage} />}
       {loading && <Loader />}
     </>

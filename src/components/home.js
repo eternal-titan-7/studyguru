@@ -2,7 +2,6 @@ import React, { useCallback, useEffect, useRef, useState } from "react";
 import "./home.css";
 import welcome from "./welcome.png";
 import SVGS from "./svgs";
-import Loader from "./loader";
 import db from "../db";
 import {
   doc,
@@ -22,8 +21,7 @@ import Assign from "./assignment";
 import Grades from "./Grades";
 import AboutUs from "./AboutUs";
 
-function HomePage({ uid, setPage }) {
-  const [loading, setLoading] = useState(true);
+function HomePage({ uid, setPage, setLoading }) {
   const auth = getAuth();
   const [userData, setUserData] = useState({
     courses: [],
@@ -42,16 +40,11 @@ function HomePage({ uid, setPage }) {
   const [courseCard, setCourseCard] = useState([]);
   const [course, setCourse] = useState("");
   const [charCount, setCharCount] = useState("");
+  const [isOpen, setIsOpen] = useState(false);
   const textAreaRef = useRef(null);
-  const sidebarRef = useRef(null);
 
   function openSidebar() {
-    const sidebar = sidebarRef.current;
-    if (sidebar.style.display === "none") {
-      sidebar.style.display = "flex";
-    } else {
-      sidebar.style.display = "none";
-    }
+    setIsOpen(!isOpen);
   }
 
   function homeView() {
@@ -150,7 +143,7 @@ function HomePage({ uid, setPage }) {
       const docRef = doc(db, "courses", courseCode);
       await deleteDoc(docRef);
     };
-  }, []);
+  }, [setLoading]);
 
   async function handleJoinCourse(e) {
     e.preventDefault();
@@ -266,7 +259,7 @@ function HomePage({ uid, setPage }) {
     }
     setCourseCard(card);
     setLoading(false);
-  }, [userData, uid, deleteCourse, signout, content]);
+  }, [userData, uid, deleteCourse, signout, content, setLoading]);
 
   const authPage = useCallback(() => {
     setPage("auth");
@@ -285,7 +278,7 @@ function HomePage({ uid, setPage }) {
       setLoading(false);
       setProfile(<button className="button" onClick={authPage}>LOGIN</button>);
     }
-  }, [uid, getData, userData, authPage]);
+  }, [uid, getData, userData, authPage, setLoading]);
 
   return (
     <>
@@ -301,7 +294,7 @@ function HomePage({ uid, setPage }) {
           {window.innerWidth >= 768 && profile}
         </div>
         <div className="app-body">
-          <aside className="app-sidebar" style={{ display: window.innerWidth < 768 ? "none" : "flex" }} ref={sidebarRef}>
+          <aside className="app-sidebar" style={{ left: window.innerWidth < 768 && !isOpen ? -300 : 0 }}>
             <div
               className={"app-sidebar-item " + (view === "home" && "active")}
               onClick={homeView}
@@ -445,7 +438,6 @@ function HomePage({ uid, setPage }) {
           </div>
         </div>
       </div>
-      {loading && <Loader></Loader>}
     </>
   );
 }
