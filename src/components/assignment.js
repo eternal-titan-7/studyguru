@@ -124,8 +124,10 @@ function Assignment({ role, uid, courseCode }) {
             card.push(
               <article className="assignment-card" key={assignment}>
                 <div className="assignment-header">
-                  <div className="assignment-title">{assignmentData.title}</div>
-                  {Status}
+                  <div className="row">
+                    <div className="assignment-title">{assignmentData.title}</div>
+                    {Status}
+                  </div>
                   {role === "Teacher" && (
                     <button
                       className="delete-btn"
@@ -284,6 +286,7 @@ function Assignment({ role, uid, courseCode }) {
         );
         try {
           await getMetadata(storageRef);
+          alert("File already exists!");
           setContent("assignments");
           setUploading(false);
           setProgressStatus([]);
@@ -306,7 +309,7 @@ function Assignment({ role, uid, courseCode }) {
             const assignment = {
               title: title.trim(),
               caption: caption.trim(),
-              start: new Date(startDatetime),
+              start: startDatetime ? new Date(startDatetime) : new Date(),
               due: new Date(dueDatetime),
               file: selectedFile.name,
               submitted: [],
@@ -579,7 +582,7 @@ function Assignment({ role, uid, courseCode }) {
             </label>
             {uploading && <Progress args={progressStatus}></Progress>}
             <button className="button" type="submit">
-              Submit Assignment
+              Submit
             </button>
           </form>
         )}
@@ -596,6 +599,7 @@ function Assignment({ role, uid, courseCode }) {
                 value={grade}
                 onChange={handleGrade}
               ></input>
+              <label>/</label>
               <input
                 className="field3"
                 type="number"

@@ -1,5 +1,5 @@
 import React, { useRef, useCallback, useEffect, useState } from "react";
-import { doc, getDoc, updateDoc, arrayUnion } from "firebase/firestore";
+import { doc, getDoc, updateDoc, arrayUnion, arrayRemove } from "firebase/firestore";
 import db from "../db";
 import SVGS from "./svgs";
 import Loader from "./loader";
@@ -20,6 +20,16 @@ function CoursePage({ role, courseCode, backFunc }) {
     setLoading(true);
     setContent(content === "Students" ? "Messages" : "Students");
   }, [content]);
+
+  const deleteMessage = useCallback(
+    (post) => async () => {
+      const courseRef = doc(db, "courses", courseCode);
+      await updateDoc(courseRef, {
+        posts: arrayRemove(post),
+      });
+    },
+    [courseCode]
+  );
 
   const getData = useCallback(async () => {
     setHeader(
@@ -52,6 +62,12 @@ function CoursePage({ role, courseCode, backFunc }) {
         <div className="post-card" key={post.time}>
           <div className="post-message">{post.message}</div>
           <div className="post-footer">
+            {role === "Teacher" && <button
+              className="delete-btn"
+              onClick={deleteMessage(post)}
+            >
+              <SVGS svgName="delete" Class="delete-icon smaller"></SVGS>
+            </button>}
             <span className="post-time">
               {post.time.toDate().toLocaleString("IN")}
             </span>
@@ -84,7 +100,7 @@ function CoursePage({ role, courseCode, backFunc }) {
       }
     }
     setLoading(false);
-  }, [courseData, teacherData, backFunc, content, studentList]);
+  }, [courseData, teacherData, backFunc, content, studentList, deleteMessage, role]);
 
   useEffect(() => {
     async function fetchData(courseCode) {

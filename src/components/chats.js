@@ -1,8 +1,9 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import "./chats.css";
 import SVGS from "./svgs";
 import Loader from "./loader";
 import {
+  arrayRemove,
   arrayUnion,
   collection,
   doc,
@@ -33,6 +34,16 @@ function Chats({ uid }) {
     textAreaRef.current.style.height = "auto";
     textAreaRef.current.style.height = `${textAreaRef.current.scrollHeight}px`;
   }
+
+  const deleteMessage = useCallback(
+    (message) => async () => {
+      const chatRef = doc(db, "chats", chatMode);
+      await updateDoc(chatRef, {
+        messages: arrayRemove(message),
+      });
+    },
+    [chatMode]
+  );
 
   useEffect(() => {
     async function fetchData() {
@@ -110,7 +121,16 @@ function Chats({ uid }) {
             className={"message-card " + (message.id === uid && "me")}
             key={message.time}
           >
-            {message.id === uid && <div className="messager">You</div>}
+            {message.id === uid && <div className="row" style={{justifyContent: "space-between"}}>
+              <div className="messager">You</div>
+              <button
+                className="delete-btn"
+                onClick={deleteMessage(message)}
+              >
+                <SVGS svgName="delete" Class="delete-icon smaller"></SVGS>
+              </button>
+            </div>
+            }
             <div className="message-card-message">{message.text}</div>
             <div className="message-card-footer">
               <span className="message-card-time">
@@ -123,7 +143,7 @@ function Chats({ uid }) {
         setLoading(false);
       });
     }
-  }, [chatMode, content, uid]);
+  }, [chatMode, content, uid, deleteMessage]);
 
   function newChat(e) {
     setChatUri(e.target.value);

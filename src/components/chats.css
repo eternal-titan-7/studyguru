@@ -128,8 +128,8 @@
 
 .open-icon {
   fill: #2f75c5;
-  width: 24px;
-  height: 24px;
+  width: 16px;
+  height: 16px;
 }
 
 .chat-form {
@@ -190,8 +190,8 @@
 
 .message-card.me {
   align-self: flex-end;
-  background: #7ca5d690;
-  border: none;
+  background: #78aef0a0;
+  border: #b2cde9 1px solid;
   border-radius: 10px 0 10px 10px;
 }
 
@@ -220,5 +220,5 @@
   font-size: 0.8rem;
   margin: 0;
   padding: 0;
-  color: #012c4e;
+  color: #013f4e;
 }

@@ -276,7 +276,7 @@ function HomePage({ uid, setPage, setLoading }) {
       return () => unsubscribe();
     } else {
       setLoading(false);
-      setProfile(<button className="button" onClick={authPage}>LOGIN</button>);
+      setProfile(<button className="button" onClick={authPage}>login / sign up</button>);
     }
   }, [uid, getData, userData, authPage, setLoading]);
 
@@ -316,9 +316,7 @@ function HomePage({ uid, setPage, setLoading }) {
               <SVGS svgName="courses" Class="sidebar-icon"></SVGS>
               <span className="sidebar-text">My Courses</span>
             </div>
-            {["viewCourse", "grades", "assignments", "materials"].includes(
-              content
-            ) && (
+            {course.length > 0 && (
                 <>
                   {userData.role === "Student" && (
                     <div

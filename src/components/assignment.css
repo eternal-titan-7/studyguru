@@ -177,8 +177,15 @@
 .row {
     display: flex;
     flex-direction: row;
-    align-items: center;
+    place-items: center;
     gap: 0.5em;
+}
+
+.column {
+  display: flex;
+  flex-direction: column;
+  place-items: center;
+  gap: 0.5em;
 }
 
 .add-btns {

@@ -10,8 +10,8 @@ function Progress({ args }) {
     return (
         <div className="progress-box">
             <div className='progress-detail'>{status}</div>
-            <div class="progress-bar">
-                <div class="progress-fill" style={{ width: `${progress.toFixed(0)}%` }}></div>
+            <div className="progress-bar">
+                <div className="progress-fill" style={{ width: `${progress.toFixed(0)}%` }}></div>
             </div>
         </div>
     );

@@ -325,6 +325,11 @@
   cursor: pointer;
 }
 
+.smaller {
+  width: 16px;
+  height: 16px;
+}
+
 .course-card {
   width: fit-content;
   height: fit-content;
@@ -668,8 +673,8 @@
   }
 
   .profile-icon {
-    width: 24px;
-    height: 24px;
+    width: 30px;
+    height: 30px;
   }
 
   .profile-name {
