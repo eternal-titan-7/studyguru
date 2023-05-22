@@ -241,6 +241,21 @@
   outline: none;
 }
 
+.notice-text {
+  width: 90%;
+  height: auto;
+  font-size: 0.9em;
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  outline: none;
+  resize: none;
+  user-select: none;
+  background: transparent;
+}
+
 .form,
 .btn {
   display: flex;

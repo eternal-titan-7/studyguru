@@ -18,6 +18,7 @@ function LoginPage({ loader, setPage }) {
   const [role, setRole] = useState("");
   const [email, setEmail] = useState("");
   const [pass, setPass] = useState("");
+  const [pass2, setPass2] = useState("");
   const [signIn, signUp, resetPass] = [
     signInWithEmailAndPassword,
     createUserWithEmailAndPassword,
@@ -137,6 +138,10 @@ function LoginPage({ loader, setPage }) {
     setPass(e.target.value);
   }
 
+  function handlePass2(e) {
+    setPass2(e.target.value);
+  }
+
   return (
     <div className="body-bg">
       <div className="container">
@@ -169,7 +174,7 @@ function LoginPage({ loader, setPage }) {
                 <SVGS svgName="name" Class="name-icon"></SVGS>
                 <input
                   autoComplete="off"
-                  placeholder="Full Name"
+                  placeholder="Enter Your Full Name"
                   className="input-field"
                   type="text"
                   value={name}
@@ -227,12 +232,13 @@ function LoginPage({ loader, setPage }) {
             </svg>
             <input
               autoComplete="off"
-              placeholder="Email"
+              placeholder="Enter Email"
               className="input-field"
               type="text"
               value={email}
               onChange={handleEmail}
               maxLength={70}
+              pattern="^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$"
               required
             />
           </div>
@@ -251,20 +257,49 @@ function LoginPage({ loader, setPage }) {
               ></path>
             </svg>
             <input
-              placeholder="Password"
+              placeholder="Enter Password"
               className="input-field"
               type="password"
               value={pass}
               onChange={handlePass}
+              pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$"
+              title="Password must contain at least 8 characters, one uppercase letter, one lowercase letter, and one digit."
               required
             />
           </div>
+          {authMode === "Sign Up" && <>
+            <div className="field">
+              <svg
+                className="input-icon"
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="16"
+                fill="currentColor"
+                viewBox="0 0 16 16"
+              >
+                <path
+                  d="M8 1a2 2 0 0 1 2 2v4H6V3a2 2 0 0 1 2-2zm3 6V3a3 3 0 0 0-6 0v4a2 2 0 0 0-2 2v5a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"
+                  fill="#000000"
+                ></path>
+              </svg>
+              <input
+                placeholder="Enter Password Again"
+                className="input-field"
+                type="password"
+                value={pass2}
+                onChange={handlePass2}
+                pattern={pass}
+                title="Password does not match above one."
+                required
+              />
+            </div>
+          </>}
           <div className="btn">
             <button className="button" type="submit">
               {authMode}
             </button>
             <button className="button" onClick={modeChange} type="button">
-              {authMode === "Login" ? "Sign Up" : "Login"}
+              {authMode === "Login" ? "Sign Up?" : "Login?"}
             </button>
           </div>
           <div className="btn">
