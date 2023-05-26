@@ -1,6 +1,5 @@
 .about-us-card {
-  width: fit-content;
-  height: fit-content;
+  width: 70%;
   display: flex;
   flex-direction: column;
   justify-content: center;

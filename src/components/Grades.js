@@ -16,6 +16,7 @@ function Grades({ grades, courseCode }) {
       setCourseName(courseDoc.data().name);
       var total = 0;
       var totalMax = 0;
+      var gradeCards = [];
       for (const key in grades) {
         if (Object.hasOwnProperty.call(grades, key)) {
           const dict = grades[key];
@@ -28,7 +29,7 @@ function Grades({ grades, courseCode }) {
             const remark = dict.remark;
             total += grade;
             totalMax += maxGrade;
-            setGradeCard(
+            gradeCards.push(
               <div className="grade-card">
                 <div className="grade-card-title">{assignment}</div>
                 <div className="grade-card-grade">
@@ -40,6 +41,7 @@ function Grades({ grades, courseCode }) {
           }
         }
       }
+      setGradeCard(gradeCards);
       setTotal(total);
       setTotalMax(totalMax);
       setPerc((total / (totalMax / 100)).toFixed(2));

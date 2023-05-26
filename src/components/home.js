@@ -20,6 +20,8 @@ import { getAuth, signOut } from "firebase/auth";
 import Assign from "./assignment";
 import Grades from "./Grades";
 import AboutUs from "./AboutUs";
+import AllCourses from "./allCourses";
+import Requests from "./requests";
 
 function HomePage({ uid, setPage, setLoading }) {
   const auth = getAuth();
@@ -40,6 +42,7 @@ function HomePage({ uid, setPage, setLoading }) {
   const [courseCard, setCourseCard] = useState([]);
   const [course, setCourse] = useState("");
   const [charCount, setCharCount] = useState("");
+  const [requests, setRequests] = useState([]);
   const [isOpen, setIsOpen] = useState(false);
   const textAreaRef = useRef(null);
 
@@ -52,7 +55,15 @@ function HomePage({ uid, setPage, setLoading }) {
     setContent("home");
   }
 
-  async function courseView() {
+  const requestView = useCallback((courseCode, data) => {
+    return () => {
+      setCourseCode(courseCode);
+      setRequests(data);
+      setContent("requests");
+    };
+  }, []);
+
+  const courseView = useCallback(async () => {
     if (!uid) {
       alert("You are not Signed In!");
       return;
@@ -64,7 +75,7 @@ function HomePage({ uid, setPage, setLoading }) {
     } else {
       setLoading(true);
     }
-  }
+  }, [course, setLoading, uid]);
 
   function assignView() {
     setView("assignments");
@@ -93,10 +104,6 @@ function HomePage({ uid, setPage, setLoading }) {
   function addCourse() {
     generateCode();
     setContent("addCourse");
-  }
-
-  function handleCcode(e) {
-    setCourseCode(e.target.value);
   }
 
   function handleCname(e) {
@@ -145,17 +152,48 @@ function HomePage({ uid, setPage, setLoading }) {
     };
   }, [setLoading]);
 
-  async function handleJoinCourse(e) {
-    e.preventDefault();
+  const leaveCourse = useCallback((courseCode, suid) => {
+    return async () => {
+      setLoading(true);
+      await updateDoc(doc(db, "users", suid), {
+        courses: arrayRemove(courseCode),
+      });
+      await updateDoc(doc(db, "courses", courseCode), {
+        students: arrayRemove(suid),
+      });
+      await courseView();
+    };
+  }, [courseView, setLoading]);
+
+  const isJoined = (courseCode) => {
+    return userData.courses.includes(courseCode);
+  };
+
+  async function handleJoinCourse(courseCode, suid = uid) {
     setLoading(true);
     if (courseCode.trim().length === 7) {
-      await updateDoc(doc(db, "users", uid), {
+      await updateDoc(doc(db, "users", suid), {
         courses: arrayUnion(courseCode.trim()),
       });
       await updateDoc(doc(db, "courses", courseCode.trim()), {
-        students: arrayUnion(uid),
+        students: arrayUnion(suid),
+      });
+      await updateDoc(doc(db, "courses", courseCode.trim()), {
+        joinRequests: arrayRemove(suid),
       });
       await courseView();
+    } else {
+      alert("Invalid Course Code!");
+    }
+  }
+
+  async function joinRequest(courseCode) {
+    setLoading(true);
+    if (courseCode.trim().length === 7) {
+      await updateDoc(doc(db, "courses", courseCode.trim()), {
+        joinRequests: arrayUnion(uid),
+      });
+      alert("Requested to join course!");
     } else {
       alert("Invalid Course Code!");
     }
@@ -233,14 +271,25 @@ function HomePage({ uid, setPage, setLoading }) {
               value={data.description}
             ></textarea>
             <div className="course-btns">
-              {userData.role === "Teacher" && (
-                <button
+              {userData.role === "Teacher" ? (
+                <><button
                   className="delete-btn"
                   onClick={deleteCourse(userData.courses[i])}
                 >
                   <SVGS svgName="delete" Class="delete-icon"></SVGS>
-                </button>
-              )}
+                </button><button
+                  className="course-btn"
+                  title="Join Requests"
+                  onClick={requestView(userData.courses[i], data)}
+                >
+                    <SVGS svgName="request" Class="open"></SVGS>
+                  </button></>
+              ) : <button
+                className="delete-btn"
+                onClick={leaveCourse(userData.courses[i], uid)}
+              >
+                <SVGS svgName="remove" Class="delete-icon"></SVGS>
+              </button>}
               <button
                 className="course-btn"
                 onClick={viewCourse(userData.courses[i])}
@@ -259,7 +308,7 @@ function HomePage({ uid, setPage, setLoading }) {
     }
     setCourseCard(card);
     setLoading(false);
-  }, [userData, uid, deleteCourse, signout, content, setLoading]);
+  }, [userData, uid, deleteCourse, signout, content, setLoading, requestView, leaveCourse]);
 
   const authPage = useCallback(() => {
     setPage("auth");
@@ -317,38 +366,38 @@ function HomePage({ uid, setPage, setLoading }) {
               <span className="sidebar-text">My Courses</span>
             </div>
             {course.length > 0 && (
-                <>
-                  {userData.role === "Student" && (
-                    <div
-                      className={
-                        "app-sidebar-item " + (view === "grades" && "active")
-                      }
-                      onClick={gradeView}
-                    >
-                      <SVGS svgName="grades" Class="sidebar-icon"></SVGS>
-                      <span className="sidebar-text">My Grades</span>
-                    </div>
-                  )}
+              <>
+                {userData.role === "Student" && (
                   <div
                     className={
-                      "app-sidebar-item " + (view === "assignments" && "active")
+                      "app-sidebar-item " + (view === "grades" && "active")
                     }
-                    onClick={assignView}
+                    onClick={gradeView}
                   >
-                    <SVGS svgName="homework" Class="sidebar-icon"></SVGS>
-                    <span className="sidebar-text">Assignments/Tests</span>
+                    <SVGS svgName="grades" Class="sidebar-icon"></SVGS>
+                    <span className="sidebar-text">My Grades</span>
                   </div>
-                  <div
-                    className={
-                      "app-sidebar-item " + (view === "materials" && "active")
-                    }
-                    onClick={resView}
-                  >
-                    <SVGS svgName="materials" Class="sidebar-icon"></SVGS>
-                    <span className="sidebar-text">Study Materials</span>
-                  </div>
-                </>
-              )}
+                )}
+                <div
+                  className={
+                    "app-sidebar-item " + (view === "assignments" && "active")
+                  }
+                  onClick={assignView}
+                >
+                  <SVGS svgName="homework" Class="sidebar-icon"></SVGS>
+                  <span className="sidebar-text">Assignments/Tests</span>
+                </div>
+                <div
+                  className={
+                    "app-sidebar-item " + (view === "materials" && "active")
+                  }
+                  onClick={resView}
+                >
+                  <SVGS svgName="materials" Class="sidebar-icon"></SVGS>
+                  <span className="sidebar-text">Study Materials</span>
+                </div>
+              </>
+            )}
             {window.innerWidth < 768 && profile}
           </aside>
           <div className="app-content">
@@ -365,10 +414,12 @@ function HomePage({ uid, setPage, setLoading }) {
             )}
             {content === "courses" && (
               <>
-                <div onClick={addCourse}>
-                  <SVGS svgName="add" Class="add-icon"></SVGS>
+                <div className="course-row">
+                  <div onClick={addCourse}>
+                    <SVGS svgName="add" Class="add-icon"></SVGS>
+                  </div>
+                  {courseCard}
                 </div>
-                {courseCard}
               </>
             )}
             {content === "addCourse" &&
@@ -399,26 +450,17 @@ function HomePage({ uid, setPage, setLoading }) {
                   </button>
                 </form>
               ) : (
-                <form onSubmit={handleJoinCourse} className="container1">
-                  <input
-                    className="field3"
-                    type="text"
-                    placeholder="Course Code"
-                    value={courseCode}
-                    onChange={handleCcode}
-                  />
-                  <button className="button" type="submit">
-                    Join Course
-                  </button>
-                </form>
+                <AllCourses joinRequest={joinRequest} joinCourse={handleJoinCourse} isJoined={isJoined}></AllCourses>
               ))}
             {content === "viewCourse" && (
               <CoursePage
                 role={userData.role}
                 courseCode={course}
+                leaveCourse={leaveCourse}
                 backFunc={back}
               ></CoursePage>
             )}
+            {content === "requests" && <Requests courseCode={courseCode} courseData={requests} joinCourse={handleJoinCourse}></Requests>}
             {content === "chats" && <Chats uid={uid}></Chats>}
             {content === "materials" && (
               <Material role={userData.role} courseCode={course}></Material>

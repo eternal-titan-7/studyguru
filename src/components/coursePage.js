@@ -4,7 +4,7 @@ import db from "../db";
 import SVGS from "./svgs";
 import Loader from "./loader";
 
-function CoursePage({ role, courseCode, backFunc }) {
+function CoursePage({ role, courseCode, leaveCourse, backFunc }) {
   const [loading, setLoading] = useState(true);
   const [header, setHeader] = useState("");
   const [courseData, setCourseData] = useState("");
@@ -94,13 +94,19 @@ function CoursePage({ role, courseCode, backFunc }) {
               <span className="chat-card-name">{student.name}</span>
               <span className="chat-card-email">{student.email}</span>
             </div>
+            {role === "Teacher" && <button
+              className="delete-btn"
+              onClick={leaveCourse(courseCode, student.uid)}
+            >
+              <SVGS svgName="remove" Class="delete-icon"></SVGS>
+            </button>}
           </div>
         ));
         setStudentCard(studentCard);
       }
     }
     setLoading(false);
-  }, [courseData, teacherData, backFunc, content, studentList, deleteMessage, role]);
+  }, [courseData, teacherData, backFunc, content, studentList, deleteMessage, role, courseCode, leaveCourse]);
 
   useEffect(() => {
     async function fetchData(courseCode) {
