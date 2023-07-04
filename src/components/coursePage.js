@@ -1,14 +1,12 @@
 import React, { useRef, useCallback, useEffect, useState } from "react";
-import { doc, getDoc, updateDoc, arrayUnion, arrayRemove } from "firebase/firestore";
-import db from "../db";
+import { doc, getDoc, updateDoc, arrayUnion, arrayRemove, onSnapshot } from "firebase/firestore";
+import { db } from "../db";
 import SVGS from "./svgs";
 import Loader from "./loader";
 
 function CoursePage({ role, courseCode, leaveCourse, backFunc }) {
   const [loading, setLoading] = useState(true);
   const [header, setHeader] = useState("");
-  const [courseData, setCourseData] = useState("");
-  const [teacherData, setTeacherData] = useState("");
   const [message, setMessage] = useState("");
   const textAreaRef = useRef(null);
   const [postCard, setPostCard] = useState("");
@@ -31,7 +29,7 @@ function CoursePage({ role, courseCode, leaveCourse, backFunc }) {
     [courseCode]
   );
 
-  const getData = useCallback(async () => {
+  const getData = useCallback(async (courseData, teacherData) => {
     setHeader(
       <div className="course-header">
         <button className="backButton" onClick={backFunc}>
@@ -106,21 +104,19 @@ function CoursePage({ role, courseCode, leaveCourse, backFunc }) {
       }
     }
     setLoading(false);
-  }, [courseData, teacherData, backFunc, content, studentList, deleteMessage, role, courseCode, leaveCourse]);
+  }, [backFunc, content, studentList, deleteMessage, role, courseCode, leaveCourse]);
 
   useEffect(() => {
     async function fetchData(courseCode) {
       const docRef = doc(db, "courses", courseCode);
-      const docSnap = await getDoc(docRef);
-      if (docSnap.exists()) {
-        const data = docSnap.data();
-        const docRef1 = doc(db, "users", data.teacher);
+      const unsubscribe = onSnapshot(docRef, async (docSnap) => {
+        const courseData = docSnap.data();
+        const docRef1 = doc(db, "users", courseData.teacher);
         const docSnap1 = await getDoc(docRef1);
-        const data1 = docSnap1.data();
-        setCourseData(data);
-        setTeacherData(data1);
-        getData();
-      }
+        const teacherData = docSnap1.data();
+        getData(courseData, teacherData);
+      });
+      return () => unsubscribe();
     }
     fetchData(courseCode);
   }, [courseCode, getData]);

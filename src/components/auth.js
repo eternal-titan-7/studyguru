@@ -1,6 +1,6 @@
 import "./auth.css";
 import { useState } from "react";
-import db from "../db";
+import { db } from "../db";
 import { doc, setDoc } from "firebase/firestore";
 import profpic from "./profile.jpg";
 import {

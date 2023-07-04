@@ -13,7 +13,7 @@ function App() {
   const [loading, setLoading] = useState(false);
   const [uid, setUid] = useState(null);
   const auth = getAuth();
-  if (window.location.hostname === "localhost") {
+  if (process.env.DATABASE_MODE === "local") {
     try {
       connectAuthEmulator(auth, "http://127.0.0.1:9099", {
         disableWarnings: true,

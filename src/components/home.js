@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useRef, useState } from "react";
 import "./home.css";
 import welcome from "./welcome.png";
 import SVGS from "./svgs";
-import db from "../db";
+import { db } from "../db";
 import {
   doc,
   setDoc,
@@ -229,7 +229,7 @@ function HomePage({ uid, setPage, setLoading }) {
       });
   }, [auth]);
 
-  const getData = useCallback(async () => {
+  const getData = useCallback(async (userData) => {
     setProfile(
       <div className="app-profile">
         <img className="profile-icon" src={userData.dp} alt="Profile pic" />
@@ -308,7 +308,7 @@ function HomePage({ uid, setPage, setLoading }) {
     }
     setCourseCard(card);
     setLoading(false);
-  }, [userData, uid, deleteCourse, signout, content, setLoading, requestView, leaveCourse]);
+  }, [uid, deleteCourse, signout, content, setLoading, requestView, leaveCourse]);
 
   const authPage = useCallback(() => {
     setPage("auth");
@@ -320,14 +320,14 @@ function HomePage({ uid, setPage, setLoading }) {
       const unsubscribe = onSnapshot(docRef, (doc) => {
         setUserData(doc.data());
         setGrades(doc.data().grades);
-        getData();
+        getData(doc.data());
       });
       return () => unsubscribe();
     } else {
       setLoading(false);
       setProfile(<button className="button" onClick={authPage}>login / sign up</button>);
     }
-  }, [uid, getData, userData, authPage, setLoading]);
+  }, [uid, authPage, getData, setLoading]);
 
   return (
     <>

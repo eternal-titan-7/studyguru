@@ -7,7 +7,7 @@ import {
   onSnapshot,
   updateDoc,
 } from "firebase/firestore";
-import db from "../db";
+import { db } from "../db";
 import SVGS from "./svgs";
 import Loader from "./loader";
 import {

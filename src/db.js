@@ -25,14 +25,14 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 
 const db = getFirestore(app);
-if (window.location.hostname === "localhost") {
+if (process.env.DATABASE_MODE === "local") {
   connectFirestoreEmulator(db, "localhost", 8080);
 }
 
 // eslint-disable-next-line no-unused-vars
 const storage = getStorage(app);
-if (window.location.hostname === "localhost") {
+if (process.env.DATABASE_MODE === "local") {
   connectStorageEmulator(storage, "localhost", 9199);
 }
 
-export default db;
+export { app, db, storage };

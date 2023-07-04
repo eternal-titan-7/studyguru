@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import "./grades.css";
 import { doc, getDoc } from "firebase/firestore";
-import db from "../db";
+import { db } from "../db";
 
 function Grades({ grades, courseCode }) {
   const [gradeCard, setGradeCard] = useState("");

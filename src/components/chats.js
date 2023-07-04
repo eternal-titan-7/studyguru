@@ -15,7 +15,7 @@ import {
   updateDoc,
   where,
 } from "firebase/firestore";
-import db from "../db";
+import { db } from "../db";
 
 function Chats({ uid }) {
   const [loading, setLoading] = useState(true);
@@ -91,11 +91,11 @@ function Chats({ uid }) {
     if (content === "chats") {
       fetchData();
     }
-  });
+  }, [uid, content]);
 
   useEffect(() => {
     if (content === "messages") {
-      onSnapshot(doc(db, "chats", chatMode), async (docSnap) => {
+      const unsubscribe = onSnapshot(doc(db, "chats", chatMode), async (docSnap) => {
         const data = docSnap.data();
         const docSnap1 = await getDoc(
           doc(
@@ -142,6 +142,7 @@ function Chats({ uid }) {
         setMessageCard(cards);
         setLoading(false);
       });
+      return () => unsubscribe();
     }
   }, [chatMode, content, uid, deleteMessage]);
 
